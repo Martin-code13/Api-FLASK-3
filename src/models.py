@@ -9,7 +9,7 @@ class User(db.Model):
     apellido = db.Column(db.String(250), nullable=False)
     password = db.Column(db.String(80), unique=False, nullable=False)
     is_active = db.Column(db.Boolean(), unique=False, nullable=False)
-    # favoritos = db.relationship("Favoritos", backref='user')
+    favoritos = db.relationship("Favoritos", backref='user')
 
     def __repr__(self):
         return '<User %r>' % self.id
@@ -33,6 +33,8 @@ class People(db.Model):
     birth_year = db.Column(db.String(250),nullable=False)
     homeworld = db.Column(db.String(250), nullable=False)
     starship = db.Column(db.String(250), nullable=False)
+    favoritos = db.relationship("Favoritos", backref='people')
+    
 
     def __repr__(self):
         return '<People %r>' % self.id
@@ -52,6 +54,7 @@ class Planetas(db.Model):
     # Here we define columns for the table person
     # Notice that each column is also a normal Python instance attribute.
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String (250))
     climate = db.Column(db.String (250))
     created = db.Column(db.String (250))
     diameter = db.Column(db.String (250))
@@ -78,6 +81,7 @@ class Favoritos(db.Model):
     # vehiculos_id = db.Column(db.Integer, db.ForeignKey('vehiculos.id'))
     planetas_id = db.Column(db.Integer, db.ForeignKey('planetas.id'))
     usuario_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    people_id = db.Column(db.Integer, db.ForeignKey('people.id'))
 
     def __repr__(self):
         return '<Favoritos %r>' % self.id
@@ -89,6 +93,8 @@ class Favoritos(db.Model):
             # "vehiculos_id": self.vehiculos_id,
             "planetas_id": self.planetas_id,
             "usuario_id": self.usuario_id,
+            "people_id": self.people_id,
+
             # do not serialize the password, its a security breac
         }
 

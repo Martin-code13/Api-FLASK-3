@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User, Planetas, Favoritos
+from models import db, User, Planetas, Favoritos, People
 #from models import Person
 
 app = Flask(__name__)
@@ -42,16 +42,164 @@ def handle_hello():
     allusers = User.query.all()
     print(allusers)
     results = list(map(lambda item: item.serialize() ,allusers))
+    print(results)
 
+
+    return jsonify(results), 200
+
+
+
+
+
+@app.route('/user/<int:user_id>/favorites', methods=['GET'])
+def handle_favs(user_id):
+    favoritos_usuario = Favoritos.query.filter_by(id = user_id).first()
+    favs = favoritos_usuario.serialize()
+    # print(allplanetaid)
     
-
     # response_body = {
     #     "msg": "Hello, this is your GET /user response "
     # }
 
-    return jsonify(results), 200
+    return jsonify(favs), 200    
+
+
+
+
+@app.route('/people', methods=['GET'])
+def handle_people():
+
+    allpeople = People.query.all()
+    print(allpeople)
+    resultss = list(map(lambda item: item.serialize() ,allpeople))
+    print(resultss)
+
+
+    return jsonify(resultss), 200  
+
+
+
+
+
+
+
+@app.route('/planetas', methods=['GET'])
+def handle_planetas():
+
+    allplanetas = Planetas.query.all()
+    print(allplanetas)
+    resultsss = list(map(lambda item: item.serialize() ,allplanetas))
+    print(resultsss)
+
+
+    return jsonify(resultsss), 200
+
+
+
+@app.route('/vehicles', methods=['GET'])
+def handle_vehicles():
+
+    allvehicles = Vehicles.query.all()
+    print(allvehicles)
+    resultssss = list(map(lambda item: item.serialize() ,allvehicles))
+    print(resultssss)
+
+
+    return jsonify(resultssss), 200
+
+@app.route('/planetas/<int:planetas_id>', methods=['GET'])
+def handle_planetaid(planetas_id):
+    allplanetasid = Planetas.query.filter_by(id = planetas_id).first()
+    planeta1 = allplanetasid.serialize()
+    # print(allplanetaid)
+    
+    # response_body = {
+    #     "msg": "Hello, this is your GET /user response "
+    # }
+
+    return jsonify(planeta1), 200
+
+
+
+
+@app.route('/people/<int:people_id>', methods=['GET'])
+def handle_peopleid(people_id):
+    allpeopleid = People.query.filter_by(id = people_id).first()
+    people_id = allpeopleid.serialize()
+    # print(allplanetaid)
+    
+    # response_body = {
+    #     "msg": "Hello, this is your GET /user response "
+    # }
+
+    return jsonify(people_id), 200
+
+
+@app.route('/user/<int:user_id>/favorite/people', methods=['POST'])
+def agregar_people(user_id):
+    request_body = request.json #Guardo la respuesta que trae la solicitud en una variable que se llama "request_body" que es un objeto
+    print(request_body)
+    
+    print(request_body["people_id"]) #Accedo a la propiedad "people_id" del objeto "request_body" para obtener su valor
+    
+    new_favorite_people = Favoritos(planetas_id = None ,usuario_id = user_id, people_id = request_body["people_id"])
+    db.session.add(new_favorite_people)
+    db.session.commit()
+    return jsonify({"msg":"Funciona"}), 200
+
+
+@app.route('/user/<int:user_id>/favorite/planetas', methods=['POST'])
+def agregar_planetas(user_id):
+    request_body = request.json #Guardo la respuesta que trae la solicitud en una variable que se llama "request_body" que es un objeto
+    print(request_body)
+    
+    print(request_body["planetas_id"]) #Accedo a la propiedad "people_id" del objeto "request_body" para obtener su valor
+    
+    new_favorite_planeta = Favoritos(planetas_id = request_body["planetas_id"]  ,usuario_id = user_id, people_id = None )
+    db.session.add(new_favorite_planeta)
+    db.session.commit()
+    return jsonify({"msg":"Funcionando"}), 200
+
+        
+        
+@app.route('/user/<int:user_id>/favorite/planetas', methods=['DELETE'])
+def borrar_planetas(user_id):
+    request_body = request.json #Guardo la respuesta que trae la solicitud en una variable que se llama "request_body" que es un objeto
+    print(request_body)
+    print(request_body["planetas_id"]) #Accedo a la propiedad "planetas_id" del objeto "request_body" para obtener su valor
+    # buscar = Favoritos.query.filter_by(usuario_id = user_id, planetas_id = request_body["planetas_id"]).first()
+    buscar = Favoritos.query.filter_by(usuario_id = user_id, planetas_id = request_body["planetas_id"]).first()
+    db.session.delete(buscar)
+    db.session.commit()
+    return jsonify({"msg":"A sido eliminado un favorito"}), 200
+
+
+
+
+
+@app.route('/user/<int:user_id>/favorite/people', methods=['DELETE'])
+def borrar_people(user_id):
+    request_body = request.json #Guardo la respuesta que trae la solicitud en una variable que se llama "request_body" que es un objeto
+    print(request_body)
+    print(request_body["people_id"]) #Accedo a la propiedad "people_id" del objeto "request_body" para obtener su valor
+    buscar2 = Favoritos.query.filter_by(usuario_id = user_id, people_id = request_body["people_id"]).first()
+    db.session.delete(buscar2)
+    db.session.commit()
+    return jsonify({"msg":"A sido eliminado un favorito"}), 200
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3000))
-    app.run(host='0.0.0.0', port=PORT, debug=False)
+    app.run(host='0.0.0.0', port=PORT, debug=False)    
+
+
+
+
+
+
+
+
+
+
+
+
